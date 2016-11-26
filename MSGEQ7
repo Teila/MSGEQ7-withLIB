@@ -1,0 +1,120 @@
+// FastLED
+#include "FastLED.h"
+
+#define LED_PINS    6 // DATA_PIN, or DATA_PIN, CLOCK_PIN
+#define COLOR_ORDER GRB
+#define CHIPSET     WS2812B // WS2811 LPD8806
+#define NUM_LEDS    240
+
+#define BRIGHTNESS  100  // reduce power consumption
+#define LED_DITHER  255  // try 0 to disable flickering
+#define CORRECTION  TypicalLEDStrip
+
+CRGB leds[NUM_LEDS]; // Define the array of leds
+
+// MSGEQ7
+#include "MSGEQ7.h"
+#define pinAnalogLeft A0
+#define pinReset 2
+#define pinStrobe 3
+#define MSGEQ7_INTERVAL ReadsPerSecond(50)
+#define MSGEQ7_SMOOTH true
+
+int length = NUM_LEDS / 4; //7 for all bands 4 for four
+
+CMSGEQ7<MSGEQ7_SMOOTH, pinReset, pinStrobe, pinAnalogLeft> MSGEQ7;
+
+void setup() {
+  Serial.begin(115200);
+  // FastLED setup
+  FastLED.addLeds<CHIPSET, LED_PINS, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(CORRECTION);
+  FastLED.setBrightness( BRIGHTNESS );
+  FastLED.setDither(LED_DITHER);
+  FastLED.show(); // needed to reset leds to zero
+
+  // This will set the IC ready for reading
+  MSGEQ7.begin();
+}
+
+uint8_t bHue = 0;
+uint8_t lHue = 0;
+uint8_t mHue = 0;
+uint8_t hHue = 0;
+
+
+void loop() {
+  // Analyze without delay
+  bool newReading = MSGEQ7.read(MSGEQ7_INTERVAL);
+  
+
+  // Led strip output
+  if (newReading) {
+    // visualize the average bass of both channels
+      uint8_t bass = MSGEQ7.get(MSGEQ7_BASS);
+      uint8_t Bvol = MSGEQ7.getVolume(0);
+      uint8_t low = MSGEQ7.get(MSGEQ7_LOW);
+      uint8_t Lvol = MSGEQ7.getVolume(3);
+      uint8_t mid = MSGEQ7.get(MSGEQ7_MID);
+      uint8_t Mvol = MSGEQ7.getVolume(5);
+      uint8_t high = MSGEQ7.get(MSGEQ7_HIGH);
+      uint8_t Hvol = MSGEQ7.getVolume(6);
+      
+//    leds[bass] = ColorFromPalette( ForestColors_p, 0, BRIGHTNESS, LINEARBLEND);
+//    leds[low] = ColorFromPalette( ForestColors_p, 50, BRIGHTNESS, LINEARBLEND);
+//    leds[mid] = ColorFromPalette( ForestColors_p, 100, BRIGHTNESS, LINEARBLEND);
+//    leds[high] = ColorFromPalette( ForestColors_p, 150, BRIGHTNESS, LINEARBLEND);
+
+    // Reduce noise
+    //val = mapNoise(val);
+    bass = mapNoise(bass);
+    low = mapNoise(low);
+    mid = mapNoise(mid);
+    high = mapNoise(high);
+
+    // Visualize leds to the beat
+    //CRGB color = ColorFromPalette(ForestColors_p,50,BRIGHTNESS,LINEARBLEND);
+    //CRGB color = CRGB::Blue;
+    //color.nscale8_video(val);
+//    for (band = 0; band < 4; band++); {
+//      for (int j=(length*band); j<(length*(band+1)); j++) {
+//        leds[j] = ColorFromPalette( ForestColors_p, band*50, BRIGHTNESS, LINEARBLEND);
+//      }
+//    }
+      
+    //fill_solid(leds, NUM_LEDS, color);
+
+    //CRGB color = CRGB::Blue;
+    //color.nscale8_video(bass);
+    int b = map(Bvol, 0, 255, 0, length);
+    int l = map(Lvol, 0, 255, 0, length);
+    int m = map(Mvol, 0, 255, 0, length);
+    int h = map(Hvol, 0, 255, 0, length);
+    
+    for(int i = 0; i<length; i++){
+      leds[i] =  ColorFromPalette(ForestColors_p, bHue+(i*2), bass, LINEARBLEND);
+    }
+    for(int i = (length); i<(length*2); i++){
+      //leds[i] = ColorFromPalette(ForestColors_p, i, i-l, LINEARBLEND);
+    }
+    for(int i = (length*2); i<(length*3); i++){
+      //leds[i] = ColorFromPalette(ForestColors_p, 100*i, i+mid, LINEARBLEND);
+    }
+    for(int i = (length*3); i<(length*4); i++){
+      //leds[i] = ColorFromPalette(ForestColors_p, i*h, i-h, LINEARBLEND);
+    }
+    // Update Leds
+    FastLED.show();
+    fadeall();
+    Serial.print(bass);
+    Serial.print(low);
+    Serial.print(mid);
+    Serial.println(high);
+  }
+}
+
+void fadeall() {
+  for(int i = 0; i < NUM_LEDS; i++) {
+    leds[i].subtractFromRGB(1);
+    //leds[i].nscale8( 250); 
+    } 
+   }

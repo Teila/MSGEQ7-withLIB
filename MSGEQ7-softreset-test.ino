@@ -55,11 +55,12 @@ CRGBPalette16 gPal;
 bool gReverseDirection = false;
 
 void setup() {
-  delay(3000);
+  delay(1000); //Boot Time
   pinMode(pinAnalogLeft, INPUT);
   pinMode(pinStrobe, OUTPUT);
   pinMode(pinReset, OUTPUT);
   // Serial.begin(115200); //serial for debug
+  
   // FastLED setup
   FastLED.addLeds<CHIPSET, LED_PINS, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(CORRECTION);
   FastLED.setBrightness(BRIGHTNESS);
@@ -124,18 +125,18 @@ unsigned long currentMillis = millis();
   if ((unsigned long)(currentMillis - previousGen2Millis) >= GenInterval) {
     fadeall();
     // Serial.println(currentMillis - previousGen2Millis); //debug
-  previousGen2Millis = currentMillis;
+    previousGen2Millis = currentMillis;
   }
  if ((unsigned long)(currentMillis - previousResetMillis) >= ResetInterval) {
     // Serial.println("reset"); //debug
     softReset();
-  previousResetMillis = currentMillis;
+    previousResetMillis = currentMillis;
   } 
 }
 
 void Lights() {
   for (int i = 0; i<NUM_LEDS; i++) {
-  leds[i] = CRGB( 60, 50, 50);
+    leds[i] = CRGB( 60, 50, 50);
   }
   FastLED.setBrightness(BRIGHTNESS);
   FastLED.show();
@@ -269,24 +270,20 @@ void FireWpalette()
 
 void fadeall() { for(int i = 0; i < NUM_LEDS; i++) { leds[i].nscale8(192); } } //Fade to black by 25%
 
-void dimall() { for(int i = 0; i < NUM_LEDS; i++) { leds[i].fadeLightBy(32); } } //Fade color by 25%
+void dimall() { for(int i = 0; i < NUM_LEDS; i++) { leds[i].fadeLightBy(32); } } //Fade color by 12.5%%
 
-void softReset(){ asm volatile ("  jmp 0"); }
+void softReset(){ asm volatile ("  jmp 0"); } //Soft Reset to address memory leak
 
 void Music() {
   
-//unsigned long currentMusicMillis = millis(); // grab current time
 unsigned long currentMillis = millis(); // grab current time
 
 for (int i=0;i<7;i++){
     digitalWrite(pinStrobe, LOW);
-    //if ((unsigned long)(currentMillis - previousMillis) >= interval) {
-    //delay(10);
     spectrumValue[i]=analogRead(pinAnalogLeft);
     spectrumValue[i]=constrain(spectrumValue[i], filter, 1023);
     spectrumValue[i]=map(spectrumValue[i], filter,1023,0,255); //test point
     digitalWrite(pinStrobe, HIGH);
-  //}
   }
   if ((unsigned long)(currentMillis - previousMillis) >= interval) {
       dimall();
@@ -336,9 +333,6 @@ for (int i=0;i<7;i++){
     //Serial.println();
    FastLED.show();
    // Serial.println(currentMillis - previousMusicMillis); //debug
-   /*if ((unsigned long)(currentMusicMillis - previousMusicMillis) >= interval) {
-    fadeall();
-   }*/
    previousMusicMillis = currentMillis;
    //LEDS.clear();
   }

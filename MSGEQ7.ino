@@ -6,6 +6,8 @@
 // FastLED
 #include "FastLED.h"
 
+#define Version "1.0.1ALT"
+
 #define LED_PINS    6 // DATA_PIN
 #define COLOR_ORDER GRB
 #define CHIPSET     WS2812B 
@@ -57,7 +59,9 @@ void setup() {
   pinMode(pinAnalogLeft, INPUT);
   pinMode(pinStrobe, OUTPUT);
   pinMode(pinReset, OUTPUT);
-  // Serial.begin(115200); //serial for debug
+  //Serial.begin(115200); //serial for debug
+  Serial.println("Startup");
+  Serial.println(Version);
   // FastLED setup
   FastLED.addLeds<CHIPSET, LED_PINS, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(CORRECTION);
   FastLED.setBrightness(BRIGHTNESS);
@@ -118,7 +122,7 @@ unsigned long currentMillis = millis();
   //Serial.println(currentMillis - previousGen2Millis);
   if ((unsigned long)(currentMillis - previousGen2Millis) >= GenInterval) {
     fadeall();
-    //Serial.println(currentMillis - previousGen2Millis); //debug
+    //Serial.println("40"/*currentMillis - previousGen2Millis*/); //debug
   previousGen2Millis = currentMillis;
   }
 }
@@ -129,6 +133,7 @@ void Lights() {
   }
   FastLED.setBrightness(240);
   FastLED.show();
+    //Serial.println("100");
 }
 
 void LightsOUT() {
@@ -136,6 +141,7 @@ void LightsOUT() {
   leds[i] = CHSV( 0, 0, 0);
   }
   FastLED.show();
+    //Serial.println("0");
 }
 
 void Fire() {
@@ -255,6 +261,7 @@ void FireWpalette()
       }
       leds[pixelnumber] = color;
     }
+    //Serial.println("fire"); //debug
 }
 
 void fadeall() { for(int i = 0; i < NUM_LEDS; i++) { leds[i].nscale8(192); } } //Fade to black by 25%
@@ -280,55 +287,34 @@ for (int i=0;i<7;i++){
   }
   if ((unsigned long)(currentMillis - previousMillis) >= interval) {
       dimall();
-      // Serial.println(currentMillis - previousMillis); // debug
+      //Serial.println("10"/*currentMillis - previousMillis*/); // debug
     previousMillis = currentMillis;
    }
   if ((unsigned long)(currentMillis - previousMusicMillis) >= MusicInterval) {
     for (int i=0;i<4;i++)
   {
-  int bass = map((spectrumValue[0]+spectrumValue[1]), 0, 300, 0, length);
+  int bass = map((spectrumValue[0]+spectrumValue[1])/1.75, 0, 300, 0, length);
   int low = map((/*spectrumValue[1]+*/spectrumValue[2]/*+spectrumValue[3]/3*/), 0, 300, 0, length);
   int mid = map((spectrumValue[4]/*+spectrumValue[5]/2*/), 0, 300, 0, length);
   int high = map(spectrumValue[6], 0, 300, 0, length);
-    //if ( bass >= length ) bass = length;
-      for(int led = 0; led < bass; led++) { 
-            leds[led] = ColorFromPalette(LavaColors_p, lHue+bass, bass+BRIGHTNESS, LINEARBLEND);
-        }
-      //fadeall();
-      //leds[bass] = ColorFromPalette(LavaColors_p, lHue+bass, bass+BRIGHTNESS, LINEARBLEND);
-      //leds[bass] = color.nscale8_video(bass);
-    //if ( low >= length) low = length;
-      for(int led = 0; led < low; led++) { 
-            leds[led+(length)] = ColorFromPalette(OceanColors_p, lHue+low, low+BRIGHTNESS, LINEARBLEND);
-        }
-      //leds[length+low] = ColorFromPalette(OceanColors_p, mHue+low, low+BRIGHTNESS, LINEARBLEND);
-      //leds[(length)+low] = color2.nscale8_video(low);
-    //if ( mid >= length) mid = length;
-      for(int led = 0; led < mid; led++) { 
-            leds[led+(length*2)] = ColorFromPalette(ForestColors_p, lHue+mid, mid+BRIGHTNESS, LINEARBLEND);
-        }
-      //leds[(length*2)+mid] = ColorFromPalette(ForestColors_p, mHue+mid, mid+BRIGHTNESS, LINEARBLEND);
-      //leds[(length*2)+mid] = color3.nscale8_video(mid);
-    //if ( high >= length) high = length;
-      for(int led = 0; led < high; led++) { 
-            leds[led+(length*3)] = ColorFromPalette(CloudColors_p, lHue+high, high+BRIGHTNESS, LINEARBLEND);
-        }
+    for(int led = 0; led < bass; led++) { 
+        leds[led] = ColorFromPalette(LavaColors_p, lHue+bass, bass+BRIGHTNESS, LINEARBLEND);
+        //Serial.println(bass); //test point
+    }
+    for(int led = 0; led < low; led++) { 
+        leds[-led-1+(length*2)] = ColorFromPalette(OceanColors_p, lHue+low, low+BRIGHTNESS, LINEARBLEND);
+    }
+    for(int led = 0; led < mid; led++) { 
+        leds[led+(length*2)] = ColorFromPalette(ForestColors_p, lHue+mid, mid+BRIGHTNESS, LINEARBLEND);
+        //Serial.println(mid); //test point
+    }
+    for(int led = 0; led < high; led++) { 
+        leds[-led+(length*4)] = ColorFromPalette(CloudColors_p, lHue+high, high+BRIGHTNESS, LINEARBLEND);
+    }
   }
-    //Serial.print(spectrumValue[0]);
-    //Serial.print(" ");
-    //Serial.print(spectrumValue[2]);
-    //Serial.print(" ");
-    //Serial.print(spectrumValue[4]);
-    //Serial.print(" ");
-    //Serial.println(spectrumValue[6]);
-    //Serial.print(currentMusicMillis - previousMusicMillis);
-    //Serial.println();
-    //Serial.println();
+    
    FastLED.show();
-   // Serial.println(currentMillis - previousMusicMillis); //debug
-   /*if ((unsigned long)(currentMusicMillis - previousMusicMillis) >= interval) {
-    fadeall();
-   }*/
+    //Serial.println("20"/*currentMillis - previousMusicMillis*/); //debug
    previousMusicMillis = currentMillis;
    //LEDS.clear();
   }

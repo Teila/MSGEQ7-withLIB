@@ -6,7 +6,7 @@
 // FastLED
 #include "FastLED.h"
 
-#define Version "1.0.1ALT"
+#define Version "1.0.2ALT"
 
 #define LED_PINS    6 // DATA_PIN
 #define COLOR_ORDER GRB

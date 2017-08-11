@@ -12,7 +12,7 @@
 #define COLOR_ORDER GRB
 #define CHIPSET     WS2812B 
 #define NUM_LEDS    240 // LED count
-#define BRIGHTNESS  100  // reduce power consumption 1-255
+#define BRIGHTNESS  200  // reduce power consumption 1-255
 #define LED_DITHER  255  // try 0 to disable flickering
 #define CORRECTION  TypicalLEDStrip
 #define FRAMES_PER_SECOND 120

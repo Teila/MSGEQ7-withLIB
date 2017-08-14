@@ -6,7 +6,7 @@
 // FastLED
 #include "FastLED.h"
 
-#define Version "1.0.7ALT"
+#define Version "1.0.8ALT"
 
 #define LED_PINS    6 // DATA_PIN
 #define COLOR_ORDER GRB
@@ -129,8 +129,8 @@ unsigned long currentMillis = millis();
 
 void Lights() {
   for (int i = 0; i<NUM_LEDS; i++) {
-  //leds[i] = CRGB( 60, 50, 50);
-  leds[i] = CRGB( 254, 245, 245);
+  leds[i] = CRGB( 60, 50, 50);
+  //leds[i] = CHSV(0, 17, BRIGHTNESS));
   }
   FastLED.setBrightness(BRIGHTNESS);
   FastLED.show();

@@ -131,7 +131,7 @@ void Lights() {
   for (int i = 0; i<NUM_LEDS; i++) {
   leds[i] = CRGB( 60, 50, 50);
   }
-  FastLED.setBrightness(240);
+  FastLED.setBrightness(BRIGHTNESS);
   FastLED.show();
     //Serial.println("100");
 }

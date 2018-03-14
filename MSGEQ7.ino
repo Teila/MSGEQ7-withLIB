@@ -158,10 +158,10 @@ unsigned long currentMillis = millis();
   
   switch(lightPattern) {
     case 1:
-     if (motionValue == HIGH){
+     //if (motionValue == HIGH){  /*sensor Idle disabled for now*/
         Music();
-     }
-     else Xmas();
+     //}
+     //else Xmas();
         break;
     case 2:
      //if (motionValue == HIGH){
